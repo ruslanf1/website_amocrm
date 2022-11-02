@@ -33,6 +33,7 @@ return [
     'amo' => [
         'id'   => env('CLIENT_ID'),
         'code' => env('CLIENT_CODE'),
+        'secret' => env('CLIENT_SECRET'),
         'redirect'  => env('CLIENT_REDIRECT_URI'),
         'domain'  => env('AMO_DOMAIN'),
     ],

@@ -44,7 +44,7 @@ class EloquentStorage extends AbstractStorage
             'access_token'  => $this->model->access_token,
             'refresh_token' => $this->model->refresh_token,
             'expires_in'    => $this->model->expires_in,
-            'created_at'    => $this->model->created_at,
+            'created_at'    => (int)$this->model->created_at,
         ];
     }
 

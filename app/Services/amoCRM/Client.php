@@ -3,7 +3,6 @@
 namespace App\Services\amoCRM;
 
 use App\Models\Account;
-use App\Models\amoCRM\Field;
 use Exception;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
@@ -19,13 +18,11 @@ class Client
     public function __construct(Account $account)
     {
         $this->storage = new EloquentStorage([
-            'domain'    => $account->subdomain ?? null,
-            'client_id' => $account->client_id ?? null,
-            'client_secret' => $account->client_secret ?? null,
+            'domain'    => $account->subdomain ?? config('services.amo.domain'),
+            'client_id' => $account->client_id ?? config('services.amo.id'),
+            'client_secret' => $account->client_secret ?? config('services.amo.secret'),
             'redirect_uri'  => config('services.amo.redirect'),
         ], $account);
-
-        \Ufee\Amo\Services\Account::setCacheTime(1);
 
         \Ufee\Amo\Oauthapi::setOauthStorage($this->storage);
     }
@@ -35,11 +32,6 @@ class Client
      */
     public function init(): Client
     {
-        if (!$this->storage->model->subdomain) {
-
-            return $this;
-        }
-
         $this->service = Oauthapi::setInstance([
             'domain'        => $this->storage->model->subdomain,
             'client_id'     => $this->storage->model->client_id,
@@ -48,11 +40,11 @@ class Client
         ]);
 
         try {
-//            $this->service->account;
+            $this->service->account;
 
             $this->auth = true;
 
-        } catch (Exception $exception) {
+        } catch (\Throwable $exception) {
 
             if ($this->storage->model->refresh_token) {
 
@@ -70,8 +62,6 @@ class Client
 
             $this->auth = true;
         }
-
-        $this->service->queries->setDelay(1);
 
         return $this;
     }

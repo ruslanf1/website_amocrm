@@ -8,15 +8,19 @@ use App\Http\Requests\StatusRequest;
 use App\Http\Requests\StoreRequest;
 use App\Models\Account;
 use App\Services\amoCRM\Client;
+use Exception;
 
 class SiteController extends Controller
 {
+    /**
+     * @throws Exception
+     */
     public function lead(LeadRequest $request)
     {
-        $amoApi = new Client(Account::find(1));
-        $amoApi->init();
-        $lead = $amoApi->service->leads;
-        dd($lead);
+        $amoApi = (new Client(Account::find(1)))->init();
+
+        $leads = $amoApi->service->leads;
+        dd($leads);
     }
 
     public function exchange(ExchangeRequest $request)
