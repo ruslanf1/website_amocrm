@@ -24,7 +24,8 @@ class ExchangeRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'cost' => 'required|integer',
+            'type' => 'required|string',
         ];
     }
 }

@@ -30,5 +30,11 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+    'amo' => [
+        'id'   => env('CLIENT_ID'),
+        'code' => env('CLIENT_CODE'),
+        'redirect'  => env('CLIENT_REDIRECT_URI'),
+        'domain'  => env('AMO_DOMAIN'),
+    ],
 
 ];
