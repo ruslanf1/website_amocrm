@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
 
             $table->integer('contact_id');
-            $table->integer('lead_id');
+            $table->integer('lead_id')->unique();
             $table->string('lead_status');
 
             $table->string('wallet');

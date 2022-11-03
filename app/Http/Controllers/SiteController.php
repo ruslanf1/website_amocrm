@@ -10,6 +10,7 @@ use App\Models\Account;
 use App\Models\Exchange;
 use App\Models\Lead;
 use App\Services\amoCRM\Client;
+use App\Services\amoCRM\Models\Contacts;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -20,12 +21,32 @@ class SiteController extends Controller
      */
 
     // Берем почту из запроса и ищем в Амо такой контакт.
+    // самый жирный запрос
     public function lead(LeadRequest $request)
     {
         $data = $request->validated();
         $amoApi = (new Client(Account::find(1)))->init();
-        $leads = $amoApi->service->leads;
-        print_r($leads);
+
+        //тут записываем в бд
+
+        if ($amoApi->auth == true) {
+
+            $contact = Contacts::search(['Почта' => '{тут почта}'], $amoApi);
+
+            if (!$contact) {
+
+//                Contacts::create1
+
+//                Contacts::update();
+            }
+
+//            $contact->id
+
+            //отдаем ид сделки
+            //{lead_id : lead->id}
+
+        } else
+            throw new Exception('Auth error');
     }
 
     // Ловим количество и тип перевода, кидаем запрос на биржу. Возвращаем данные пользователю.
@@ -44,7 +65,7 @@ class SiteController extends Controller
 
         $leadId = $request->leads['status'][0]['id'];
 
-        $leadStatus = $request->status;
+        $leadStatus = $request->value;
 
         try {
             $model = Lead::query()
@@ -60,7 +81,7 @@ class SiteController extends Controller
 
         } catch (\Throwable $exception) {
 
-
+            dd($exception->getMessage());
         }
     }
 
@@ -68,5 +89,10 @@ class SiteController extends Controller
     public function store(StoreRequest $request)
     {
         $data = $request->validated();
+    }
+
+    public function index(Lead $lead)
+    {
+//        return {status : $lead->status}
     }
 }
