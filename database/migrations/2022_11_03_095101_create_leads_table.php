@@ -20,13 +20,13 @@ return new class extends Migration
             $table->integer('lead_id');
             $table->string('lead_status');
 
-            $table->integer('wallet');
-            $table->string('type');
+            $table->string('wallet');
+            $table->string('type_exchange');
             $table->string('email');
-            $table->string('method');
-            $table->integer('send_cost');
+            $table->string('method_pay');
+            $table->float('send_cost');
             $table->string('send_currency');
-            $table->integer('need_cost');
+            $table->float('need_cost');
             $table->string('need_currency');
 
             $table->string('exchange_rate');
