@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ExchangeRequest;
 use App\Http\Requests\LeadRequest;
 use App\Http\Requests\StatusRequest;
-use App\Http\Requests\StoreRequest;
 use App\Models\Account;
 use App\Models\Lead;
 use App\Services\amoCRM\Client;
@@ -13,6 +12,7 @@ use App\Services\amoCRM\Models\Contacts;
 use App\Services\amoCRM\Models\Leads;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Log;
 
 class SiteController extends Controller
 {
@@ -56,16 +56,10 @@ class SiteController extends Controller
         $data = $request->validated();
     }
 
-    // +Принимаем хук о смене этапа в Амо.
-    // Ищем лид в БД и меняем у него значение статус.
-    // Пост запрос на роут status. В урле параметр статуса. В теле id сделки.
-    // Все входящие запросы логируем. Если лид не найден, создаем в логе алерт.
     public function status(StatusRequest $request)
     {
-//        $data = $request->validated();
-
+        Log::info($request->input());
         $leadId = $request->leads['status'][0]['id'];
-
         $leadStatus = $request->value;
 
         try {
@@ -73,21 +67,21 @@ class SiteController extends Controller
                 ->where('lead_id', $leadId)
                 ->firstOrFail();
 
-            $model->status = $leadStatus;
+            $model->lead_status = $leadStatus;
             $model->save();
 
         } catch (ModelNotFoundException $exception) {
 
-            dd($exception->getMessage());
+            Log::alert($exception->getMessage());
 
         } catch (\Throwable $exception) {
 
-            dd($exception->getMessage());
+            Log::alert($exception->getMessage());
         }
     }
 
-    public function index(Lead $lead)
+    public function index()
     {
-//        return {status : $lead->status}
+        return Lead::get('lead_status');
     }
 }
