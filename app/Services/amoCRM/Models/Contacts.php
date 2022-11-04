@@ -75,13 +75,12 @@ abstract class Contacts extends Client
         return $contact;
     }
 
-    public static function create(Client $amoapi, $name = 'Неизвестно')
+    public static function create(Client $amoapi, $email)
     {
-        $contact = $amoapi->service
-            ->contacts()
-            ->create();
+        $contact = $amoapi->service->contacts()->create();
 
-        $contact->name = $name;
+        $contact->name = $email;
+        $contact->cf('Email')->setValue($email);
         $contact->save();
 
         return $contact;

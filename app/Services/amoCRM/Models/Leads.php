@@ -53,22 +53,22 @@ abstract class Leads
         }
     }
 
-    public static function create($contact, array $params, string $leadname)
+    public static function create($contact, array $params)
     {
         $lead = $contact->createLead();
 
-        $lead->name = $leadname;
-
-        if(!empty($params['sale']))
-            $lead->sale = $params['sale'];
-
-        if(!empty($params['responsible_user_id']))
-            $lead->responsible_user_id = $params['responsible_user_id'];
-
-        if(!empty($params['status_id']))
-            $lead->status_id = $params['status_id'];
-
+        $lead->name = $contact->name;
         $lead->contacts_id = $contact->id;
+
+        $lead->cf('wallet')->setValue($params['wallet']);
+        $lead->cf('type_exchange')->setValue($params['type_exchange']);
+        $lead->cf('method_pay')->setValue($params['method_pay']);
+        $lead->cf('send_cost')->setValue($params['send_cost']);
+        $lead->cf('send_currency')->setValue($params['send_currency']);
+        $lead->cf('need_cost')->setValue($params['need_cost']);
+        $lead->cf('need_currency')->setValue($params['need_currency']);
+        $lead->cf('exchange_rate')->setValue($params['exchange_rate']);
+
         $lead->save();
 
         return $lead;

@@ -22,5 +22,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/exchange', [SiteController::class, 'exchange']);
 Route::post('status', [SiteController::class, 'status']);
 Route::get('test/{leads:lead_id}', [SiteController::class, 'test']);
-Route::get('/lead', [SiteController::class, 'lead']);
+Route::post('/lead', [SiteController::class, 'lead']);
 Route::post('/', [SiteController::class, 'store']);

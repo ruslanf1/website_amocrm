@@ -7,10 +7,10 @@ use App\Http\Requests\LeadRequest;
 use App\Http\Requests\StatusRequest;
 use App\Http\Requests\StoreRequest;
 use App\Models\Account;
-use App\Models\Exchange;
 use App\Models\Lead;
 use App\Services\amoCRM\Client;
 use App\Services\amoCRM\Models\Contacts;
+use App\Services\amoCRM\Models\Leads;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -24,26 +24,30 @@ class SiteController extends Controller
     // самый жирный запрос
     public function lead(LeadRequest $request)
     {
-        $data = $request->validated();
-        $amoApi = (new Client(Account::find(1)))->init();
+        $data = $request->all();
+        $data['send_cost'] = $data['send'][0]['cost'];
+        $data['send_currency'] = $data['send'][0]['currency'];
+        $data['need_cost'] = $data['need'][0]['cost'];
+        $data['need_currency'] = $data['need'][0]['currency'];
+        $data['type_exchange'] = $data['type'];
+        $data['method_pay'] = $data['method'];
+        unset($data['send'], $data['need'], $data['type'], $data['method']);
 
-        //тут записываем в бд
+        $amoApi = (new Client(Account::all()->last()))->init();
 
-        if ($amoApi->auth == true) {
-
-            $contact = Contacts::search(['Почта' => '{тут почта}'], $amoApi);
+        if ($amoApi->auth) {
+            $contact = Contacts::search(['Почта' => $data['email']], $amoApi);
 
             if (!$contact) {
-
-//                Contacts::create1
-
-//                Contacts::update();
+                $contact = Contacts::create($amoApi, $data['email']);
             }
 
-//            $contact->id
+            $lead = Leads::create($contact, $data);
 
-            //отдаем ид сделки
-            //{lead_id : lead->id}
+            $data['contact_id'] = $contact->id;
+            $data['lead_id'] = $lead->id;
+
+            $this->store($data);
 
         } else
             throw new Exception('Auth error');
@@ -86,9 +90,9 @@ class SiteController extends Controller
     }
 
     // Сохраняем данные о пользователе и обмене в БД.
-    public function store(StoreRequest $request)
+    public function store($data)
     {
-        $data = $request->validated();
+        Lead::firstOrCreate(['lead_id' => $data['lead_id']], $data);
     }
 
     public function index(Lead $lead)

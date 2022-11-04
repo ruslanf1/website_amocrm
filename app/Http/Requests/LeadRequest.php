@@ -24,7 +24,7 @@ class LeadRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+
         ];
     }
 }
