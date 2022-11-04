@@ -19,19 +19,9 @@ class SiteController extends Controller
     /**
      * @throws Exception
      */
-
-    // Берем почту из запроса и ищем в Амо такой контакт.
-    // самый жирный запрос
     public function lead(LeadRequest $request)
     {
-        $data = $request->all();
-        $data['send_cost'] = $data['send'][0]['cost'];
-        $data['send_currency'] = $data['send'][0]['currency'];
-        $data['need_cost'] = $data['need'][0]['cost'];
-        $data['need_currency'] = $data['need'][0]['currency'];
-        $data['type_exchange'] = $data['type'];
-        $data['method_pay'] = $data['method'];
-        unset($data['send'], $data['need'], $data['type'], $data['method']);
+        $data = $request->input();
 
         $amoApi = (new Client(Account::all()->last()))->init();
 
@@ -41,14 +31,21 @@ class SiteController extends Controller
             if (!$contact) {
                 $contact = Contacts::create($amoApi, $data['email']);
             }
-
             $lead = Leads::create($contact, $data);
 
-            $data['contact_id'] = $contact->id;
-            $data['lead_id'] = $lead->id;
-
-            $this->store($data);
-
+            Lead::create([
+                'contact_id' => $contact->id,
+                'lead_id' => $lead->id,
+                'wallet' => $data['wallet'],
+                'type_exchange' => $data['type'],
+                'email' => $data['email'],
+                'method_pay' => $data['method'],
+                'send_cost' => $data['send'][0]['cost'],
+                'send_currency' => $data['send'][0]['currency'],
+                'need_cost' => $data['need'][0]['cost'],
+                'need_currency' => $data['need'][0]['currency'],
+                'exchange_rate' => $data['exchange_rate'],
+            ]);
         } else
             throw new Exception('Auth error');
     }
@@ -87,12 +84,6 @@ class SiteController extends Controller
 
             dd($exception->getMessage());
         }
-    }
-
-    // Сохраняем данные о пользователе и обмене в БД.
-    public function store($data)
-    {
-        Lead::firstOrCreate(['lead_id' => $data['lead_id']], $data);
     }
 
     public function index(Lead $lead)

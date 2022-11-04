@@ -60,14 +60,14 @@ abstract class Leads
         $lead->name = $contact->name;
         $lead->contacts_id = $contact->id;
 
-        $lead->cf('wallet')->setValue($params['wallet']);
-        $lead->cf('type_exchange')->setValue($params['type_exchange']);
-        $lead->cf('method_pay')->setValue($params['method_pay']);
-        $lead->cf('send_cost')->setValue($params['send_cost']);
-        $lead->cf('send_currency')->setValue($params['send_currency']);
-        $lead->cf('need_cost')->setValue($params['need_cost']);
-        $lead->cf('need_currency')->setValue($params['need_currency']);
-        $lead->cf('exchange_rate')->setValue($params['exchange_rate']);
+        $lead->cf('Платежные данные')->setValue($params['wallet']);
+        $lead->cf('Тип обмена')->setValue($params['type']);
+        $lead->cf('Метод платежа')->setValue($params['method']);
+        $lead->cf('Отправленная сумма')->setValue($params['send'][0]['cost']);
+        $lead->cf('Отправленная валюта')->setValue($params['send'][0]['currency']);
+        $lead->cf('Нужная сумма')->setValue($params['need'][0]['cost']);
+        $lead->cf('Нужная валюта')->setValue($params['need'][0]['currency']);
+        $lead->cf('Обменный курс')->setValue($params['exchange_rate']);
 
         $lead->save();
 

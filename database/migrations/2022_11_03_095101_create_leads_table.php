@@ -19,7 +19,6 @@ return new class extends Migration
             $table->integer('contact_id');
             $table->integer('lead_id')->unique();
             $table->string('lead_status')->default('waiting_for_payment');
-
             $table->string('wallet');
             $table->string('type_exchange');
             $table->string('email');
@@ -28,7 +27,6 @@ return new class extends Migration
             $table->string('send_currency');
             $table->float('need_cost');
             $table->string('need_currency');
-
             $table->float('exchange_rate');
 
             $table->timestamps();
