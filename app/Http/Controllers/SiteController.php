@@ -21,33 +21,40 @@ class SiteController extends Controller
      */
     public function lead(LeadRequest $request)
     {
-        $data = $request->input();
+        try {
+            $data = $request->input();
 
-        $amoApi = (new Client(Account::all()->last()))->init();
+            $amoApi = (new Client(Account::all()->last()))->init();
 
-        if ($amoApi->auth) {
-            $contact = Contacts::search(['Почта' => $data['email']], $amoApi);
+            if ($amoApi->auth) {
+                $contact = Contacts::search(['Почта' => $data['email']], $amoApi);
 
-            if (!$contact) {
-                $contact = Contacts::create($amoApi, $data['email']);
+                if (!$contact) {
+                    $contact = Contacts::create($amoApi, $data['email']);
+                }
+                $lead = Leads::create($contact, $data);
+
+                Lead::create([
+                    'contact_id' => $contact->id,
+                    'lead_id' => $lead->id,
+                    'wallet' => $data['wallet'],
+                    'type_exchange' => $data['type'],
+                    'email' => $data['email'],
+                    'method_pay' => $data['method'],
+                    'send_cost' => $data['send'][0]['cost'],
+                    'send_currency' => $data['send'][0]['currency'],
+                    'need_cost' => $data['need'][0]['cost'],
+                    'need_currency' => $data['need'][0]['currency'],
+                    'exchange_rate' => $data['exchange_rate'],
+                ]);
+            } else {
+                throw new Exception('Auth error');
             }
-            $lead = Leads::create($contact, $data);
+            return $lead->id;
 
-            Lead::create([
-                'contact_id' => $contact->id,
-                'lead_id' => $lead->id,
-                'wallet' => $data['wallet'],
-                'type_exchange' => $data['type'],
-                'email' => $data['email'],
-                'method_pay' => $data['method'],
-                'send_cost' => $data['send'][0]['cost'],
-                'send_currency' => $data['send'][0]['currency'],
-                'need_cost' => $data['need'][0]['cost'],
-                'need_currency' => $data['need'][0]['currency'],
-                'exchange_rate' => $data['exchange_rate'],
-            ]);
-        } else
-            throw new Exception('Auth error');
+        } catch (\Throwable $exception) {
+            $exception->getMessage();
+        }
     }
 
     // Ловим количество и тип перевода, кидаем запрос на биржу. Возвращаем данные пользователю.
