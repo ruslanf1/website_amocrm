@@ -24,7 +24,8 @@ class StatusRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'value' => 'required|string',
+            'leads.status.*.id' => 'required|integer'
         ];
     }
 }

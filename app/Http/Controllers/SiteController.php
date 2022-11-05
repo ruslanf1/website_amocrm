@@ -23,7 +23,7 @@ class SiteController extends Controller
     public function lead(LeadRequest $request)
     {
         try {
-            $data = $request->input();
+            $data = $request->validated();
 
             $amoApi = (new Client(Account::first()))->init();
 
@@ -66,15 +66,13 @@ class SiteController extends Controller
 
     public function updateStatus(StatusRequest $request)
     {
-        $leadId = $request->leads['status'][0]['id'];
-        $leadStatus = $request->value;
+        $data = $request->validated();
 
         try {
             $model = Exchange::query()
-                ->where('lead_id', $leadId)
+                ->where('lead_id', $data['leads']['status'][0]['id'])
                 ->firstOrFail();
-
-            $model->lead_status = $leadStatus;
+            $model->lead_status = $data['value'];
             $model->save();
 
         } catch (ModelNotFoundException $exception) {

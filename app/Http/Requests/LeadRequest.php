@@ -24,7 +24,15 @@ class LeadRequest extends FormRequest
     public function rules()
     {
         return [
-
+            'wallet' => 'required',
+            'type' => 'required|string',
+            'email' => 'required|email',
+            'method' => 'required|string',
+            'exchange_rate' => 'required|numeric',
+            'send.*.cost' => 'required|numeric',
+            'send.*.currency' => 'required|string',
+            'need.*.cost' => 'required|numeric',
+            'need.*.currency' => 'required|string',
         ];
     }
 }
