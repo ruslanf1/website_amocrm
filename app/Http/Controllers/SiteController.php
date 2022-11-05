@@ -8,7 +8,7 @@ use App\Http\Requests\StatusRequest;
 use App\Http\Resources\Lead\IdResource;
 use App\Http\Resources\Lead\StatusResource;
 use App\Models\Account;
-use App\Models\Lead;
+use App\Models\Exchange;
 use App\Services\amoCRM\Client;
 use App\Services\amoCRM\Models\Contacts;
 use App\Services\amoCRM\Models\Leads;
@@ -35,7 +35,7 @@ class SiteController extends Controller
                 }
                 $lead = Leads::create($contact, $data);
 
-                Lead::create([
+                Exchange::create([
                     'contact_id' => $contact->id,
                     'lead_id' => $lead->id,
                     'wallet' => $data['wallet'],
@@ -64,13 +64,13 @@ class SiteController extends Controller
         $data = $request->validated();
     }
 
-    public function status(StatusRequest $request)
+    public function updateStatus(StatusRequest $request)
     {
         $leadId = $request->leads['status'][0]['id'];
         $leadStatus = $request->value;
 
         try {
-            $model = Lead::query()
+            $model = Exchange::query()
                 ->where('lead_id', $leadId)
                 ->firstOrFail();
 
@@ -87,7 +87,7 @@ class SiteController extends Controller
         }
     }
 
-    public function index(Lead $lead)
+    public function getStatus(Exchange $lead)
     {
             return new StatusResource($lead);
     }

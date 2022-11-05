@@ -20,6 +20,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('exchange', [SiteController::class, 'exchange']);
-Route::post('status', [SiteController::class, 'status'])->middleware('status.log');
-Route::get('index/{lead:lead_id}', [SiteController::class, 'index']);
+Route::post('status', [SiteController::class, 'updateStatus'])->middleware('status.log');
+Route::get('index/{lead:lead_id}', [SiteController::class, 'getStatus']);
 Route::post('lead', [SiteController::class, 'lead']);
