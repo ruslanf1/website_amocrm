@@ -18,7 +18,7 @@ return new class extends Migration
 
             $table->integer('contact_id');
             $table->integer('lead_id')->unique();
-            $table->string('lead_status')->default('waiting_for_payment');
+            $table->string('lead_status')->default('Ждем оплату');
             $table->string('wallet');
             $table->string('type_exchange');
             $table->string('email');
