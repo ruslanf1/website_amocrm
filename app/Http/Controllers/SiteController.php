@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ExchangeRequest;
 use App\Http\Requests\LeadRequest;
 use App\Http\Requests\StatusRequest;
+use App\Http\Resources\Lead\IdResource;
+use App\Http\Resources\Lead\StatusResource;
 use App\Models\Account;
 use App\Models\Lead;
 use App\Services\amoCRM\Client;
@@ -12,7 +14,6 @@ use App\Services\amoCRM\Models\Contacts;
 use App\Services\amoCRM\Models\Leads;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Log;
 
 class SiteController extends Controller
 {
@@ -24,7 +25,7 @@ class SiteController extends Controller
         try {
             $data = $request->input();
 
-            $amoApi = (new Client(Account::all()->last()))->init();
+            $amoApi = (new Client(Account::first()))->init();
 
             if ($amoApi->auth) {
                 $contact = Contacts::search(['Почта' => $data['email']], $amoApi);
@@ -50,7 +51,7 @@ class SiteController extends Controller
             } else {
                 throw new Exception('Auth error');
             }
-            return $lead->id;
+            return new IdResource($lead);
 
         } catch (\Throwable $exception) {
             $exception->getMessage();
@@ -65,7 +66,6 @@ class SiteController extends Controller
 
     public function status(StatusRequest $request)
     {
-        Log::info($request->input());
         $leadId = $request->leads['status'][0]['id'];
         $leadStatus = $request->value;
 
@@ -79,16 +79,16 @@ class SiteController extends Controller
 
         } catch (ModelNotFoundException $exception) {
 
-            Log::alert($exception->getMessage());
+            return $exception->getMessage();
 
         } catch (\Throwable $exception) {
 
-            Log::alert($exception->getMessage());
+            return $exception->getMessage();
         }
     }
 
-    public function index()
+    public function index(Lead $lead)
     {
-        return Lead::get('lead_status');
+            return new StatusResource($lead);
     }
 }
