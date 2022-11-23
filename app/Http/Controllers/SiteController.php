@@ -22,9 +22,9 @@ class SiteController extends Controller
      */
     public function lead(LeadRequest $request)
     {
-        try {
-            $data = $request->validated();
+        $data = $request->validated();
 
+        try {
             $amoApi = (new Client(Account::first()))->init();
 
             if ($amoApi->auth) {
@@ -35,33 +35,37 @@ class SiteController extends Controller
                 }
                 $lead = Leads::create($contact, $data);
 
-                Exchange::create([
-                    'contact_id' => $contact->id,
-                    'lead_id' => $lead->id,
-                    'wallet' => $data['wallet'],
-                    'type_exchange' => $data['type'],
-                    'email' => $data['email'],
-                    'method_pay' => $data['method'],
-                    'send_cost' => $data['send'][0]['cost'],
-                    'send_currency' => $data['send'][0]['currency'],
-                    'need_cost' => $data['need'][0]['cost'],
-                    'need_currency' => $data['need'][0]['currency'],
-                    'exchange_rate' => $data['exchange_rate'],
-                ]);
             } else {
                 throw new Exception('Auth error');
             }
             return new IdResource($lead);
 
         } catch (\Throwable $exception) {
+
             $exception->getMessage();
+
+        } finally {
+
+            Exchange::query()->create([
+                'contact_id' => $contact->id ?? null,
+                'lead_id' => $lead->id ?? null,
+                'wallet' => $data['wallet'],
+                'type_exchange' => $data['type'],
+                'email' => $data['email'],
+                'method_pay' => $data['method'],
+                'send_cost' => $data['send'][0]['cost'],
+                'send_currency' => $data['send'][0]['currency'],
+                'need_cost' => $data['need'][0]['cost'],
+                'need_currency' => $data['need'][0]['currency'],
+                'exchange_rate' => $data['exchange_rate'],
+            ]);
         }
     }
 
     // Ловим количество и тип перевода, кидаем запрос на биржу. Возвращаем данные пользователю.
     public function exchange(ExchangeRequest $request)
     {
-        $data = $request->validated();
+
     }
 
     public function updateStatus(StatusRequest $request)
@@ -85,8 +89,8 @@ class SiteController extends Controller
         }
     }
 
-    public function getStatus(Exchange $lead)
+    public function getStatus(Exchange $exchange)
     {
-            return new StatusResource($lead);
+            return new StatusResource($exchange);
     }
 }
